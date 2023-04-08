@@ -10,6 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,35 +20,36 @@ import java.util.Objects;
 @SpringBootApplication
 public class RestTemplateApplication {
 
-	private static final String URL = "http://94.198.50.185:7081/api/users/";
+	private static final String URL = "http://94.198.50.185:7081/api/users";
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestTemplateApplication.class);
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext applicationContext = SpringApplication.run(RestTemplateApplication.class, args);
 		RestTemplate restTemplate = new RestTemplate();
 
-		HttpHeaders headers = getUsers(restTemplate);
+		String jsessionid = getUsers(restTemplate);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(HttpHeaders.COOKIE, jsessionid);
 
 		String part1 = postRequest(headers, restTemplate);
-
 		String part2 = putRequest(headers, restTemplate);
-
 		String part3 = deleteRequest(headers, restTemplate);
+		String fullMessage = part1 + part2 + part3;
 
-		LOGGER.info(part1);
-		LOGGER.info(part2);
-		LOGGER.info(part3);
+		LOGGER.info(fullMessage);
+
 		applicationContext.close();
 	}
 
-	static HttpHeaders getUsers(RestTemplate restTemplate) {
+	static String  getUsers(RestTemplate restTemplate) {
 		ResponseEntity<User[]> response = restTemplate.getForEntity(URL, User[].class);
-		HttpHeaders headers = response.getHeaders();
 		User[] body = Objects.requireNonNull(response.getBody());
 		var objectList = Arrays.asList(body);
 		objectList.forEach(o -> LOGGER.info(o.toString()));
 
-		return headers;
+		return response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
 	}
 
 	@SneakyThrows
@@ -64,14 +66,16 @@ public class RestTemplateApplication {
 		String json = userUpdate.getJson();
 		HttpEntity<String> putRequest = new HttpEntity<>(json, headers);
 
-		return restTemplate.postForObject(URL, putRequest, String.class);
+		ResponseEntity<String> response = restTemplate.exchange(URL, HttpMethod.PUT, putRequest, String.class);
+
+		return response.getBody();
 	}
 
 	static String deleteRequest(HttpHeaders headers, RestTemplate restTemplate) {
-		String deleteUrl =  URL + "3";
+		String deleteUrl =  URL + "/3";
 		HttpEntity<String> deleteRequest = new HttpEntity<>(headers);
 		ResponseEntity<String> response = restTemplate.exchange(deleteUrl, HttpMethod.DELETE, deleteRequest, String.class);
 
-		return response.toString();
+		return response.getBody();
 	}
 }

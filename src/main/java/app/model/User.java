@@ -14,10 +14,10 @@ import org.json.JSONObject;
 @ToString
 @Data
 public class User {
-    private final long id;
-    private final String name;
-    private final String lastName;
-    private final int age;
+    private long id;
+    private String name;
+    private String lastName;
+    private int age;
 
     @JsonCreator
     public User(
