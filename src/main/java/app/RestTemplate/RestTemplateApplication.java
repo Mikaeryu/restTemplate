@@ -10,20 +10,16 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @SpringBootApplication
 public class RestTemplateApplication {
 
-	private static final String URL = "http://94.198.50.185:7081/api/users";
+	private static final String URL = "http://94.198.50.185:7081/api/users/";
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestTemplateApplication.class);
 
 	public static void main(String[] args) {
@@ -36,8 +32,11 @@ public class RestTemplateApplication {
 
 		String part2 = putRequest(headers, restTemplate);
 
+		String part3 = deleteRequest(headers, restTemplate);
+
 		LOGGER.info(part1);
 		LOGGER.info(part2);
+		LOGGER.info(part3);
 		applicationContext.close();
 	}
 
@@ -66,5 +65,13 @@ public class RestTemplateApplication {
 		HttpEntity<String> putRequest = new HttpEntity<>(json, headers);
 
 		return restTemplate.postForObject(URL, putRequest, String.class);
+	}
+
+	static String deleteRequest(HttpHeaders headers, RestTemplate restTemplate) {
+		String deleteUrl =  URL + "3";
+		HttpEntity<String> deleteRequest = new HttpEntity<>(headers);
+		ResponseEntity<String> response = restTemplate.exchange(deleteUrl, HttpMethod.DELETE, deleteRequest, String.class);
+
+		return response.toString();
 	}
 }

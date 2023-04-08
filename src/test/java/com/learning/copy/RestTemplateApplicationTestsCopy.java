@@ -43,11 +43,8 @@ class RestTemplateApplicationTestsCopy {
 
 		System.out.println(jsessionid);
 
-//		System.out.println(response.getHeaders());
-//		System.out.println(response.ok().body("data"));
 		var objectList = response.getBody();
 		objectList.forEach(System.out::println);
-//		System.out.println(response.getStatusCode());
 		Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
 	}
 

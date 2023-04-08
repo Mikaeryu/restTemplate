@@ -3,12 +3,16 @@ package app.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.ToString;
 import org.json.JSONObject;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ToString
+@Data
 public class User {
     private final long id;
     private final String name;
